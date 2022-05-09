@@ -20,6 +20,7 @@ async function run() {
         await client.connect();
         const productCollection = client.db('warehouse').collection('product');
 
+        // product API
         app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productCollection.find(query);
@@ -32,6 +33,13 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const product = await productCollection.findOne(query);
             res.send(product);
+        });
+
+        // post
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productCollection.insertOne(newProduct);
+            res.send(result);
         })
     }
     finally {
