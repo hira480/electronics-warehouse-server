@@ -19,6 +19,7 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('warehouse').collection('product');
+        const myItemCollection = client.db('warehouse').collection('myItems');
 
         // product API
         app.get('/product', async (req, res) => {
@@ -47,6 +48,21 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        // myItems API
+        app.get('/myItems', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const cursor = myItemCollection.find(query);
+            const myItems = await cursor.toArray();
+            res.send(myItems);
+        });
+
+        app.post('myItems', async (req, res) => {
+            const myItems = req.body;
+            const result = await myItemCollection.insertOne(myItems);
             res.send(result);
         })
     }
