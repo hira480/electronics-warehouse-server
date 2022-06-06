@@ -50,6 +50,43 @@ async function run() {
             const result = await productCollection.deleteOne(query);
             res.send(result);
         });
+        // -------------------------------------------------------------
+        // update quantity
+        app.put('/product/:_id', async (req, res) => {
+            const _id = req.params._id;
+            const query = { _id: ObjectId(_id) };
+            const updatedQuantity = req.body;
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    quantity: updatedQuantity.deliveredQuantity,
+                },
+            };
+            const result = await productCollection.updateOne(
+                query,
+                updateDoc,
+                options
+            );
+            const result1 = await productCollection.findOne(query);
+            res.send(result1);
+        });
+
+        // get logged user data
+        app.get("/product", async (req, res) => {
+            const email = req.query.email;
+            if (email) {
+                const query = { email: email };
+                const cursor = productCollection.find(query);
+                const result = await cursor.toArray();
+                res.send(result);
+            } else {
+                const query = {};
+                const cursor = productCollection.find(query);
+                const product = await cursor.toArray();
+                res.send(product);
+            }
+        });
+        // --------------------------------------------------------------
 
         // myItems API
         app.get('/myItems', async (req, res) => {
